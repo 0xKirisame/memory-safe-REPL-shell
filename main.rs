@@ -42,12 +42,13 @@ fn main() {
     let arguments: Vec<&str> = clean_command.split_whitespace().collect(); 
 
     //shell bultin commands
-    let builtins = ["exit", "echo", "type"];
+    let builtins = ["exit", "echo", "type", "pwd"];
 
     //match shell commands if found
     match arguments[0] { 
         "exit" => std::process::exit(arguments.get(1).map_or(0, |v| v.parse::<i32>().unwrap_or(0))),
         "echo" => println!("{}", arguments.get(1..).map_or(String::new(), |v| v.join(" "))),
+        "pwd" => println!("{}", std::env::current_dir().unwrap().to_string_lossy()),
         "type" => if let Some(target) = arguments.get(1) {
 
                      if builtins.contains(target){
