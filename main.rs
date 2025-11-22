@@ -42,13 +42,25 @@ fn main() {
     let arguments: Vec<&str> = clean_command.split_whitespace().collect(); 
 
     //shell bultin commands
-    let builtins = ["exit", "echo", "type", "pwd"];
+    let builtins = ["exit", "echo", "type", "pwd", "cd"];
 
     //match shell commands if found
     match arguments[0] { 
         "exit" => std::process::exit(arguments.get(1).map_or(0, |v| v.parse::<i32>().unwrap_or(0))),
         "echo" => println!("{}", arguments.get(1..).map_or(String::new(), |v| v.join(" "))),
         "pwd" => println!("{}", std::env::current_dir().unwrap().to_string_lossy()),
+        "cd" => {
+            if arguments.get(1).is_none() || arguments[1] == "~" {
+            std::env::set_current_dir(std::env::var("HOME").unwrap());
+        }
+
+        else if !std::path::Path::new(arguments[1]).exists() {
+            eprintln!("cd: {}: No such file or directory", arguments[1])
+        }
+
+        else {
+            std::env::set_current_dir(arguments[1]);
+        }},
         "type" => if let Some(target) = arguments.get(1) {
 
                      if builtins.contains(target){
